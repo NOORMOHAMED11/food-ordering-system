@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TastyGo — Food Ordering System</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🍔 TastyGo</h1>
+    <nav>
+      <a href="#menu" class="active" data-view="menu">Menu</a>
+      <a href="#cart" data-view="cart">Cart (<span id="cart-count">0</span>)</a>
+      <a href="#orders" data-view="orders">My Orders</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="menu" class="view active">
+      <h2>Our Menu</h2>
+      <div class="filters" id="filters"></div>
+      <div id="menu-container" class="grid"></div>
+    </section>
+
+    <section id="cart" class="view">
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <p class="total">Total: ₹<span id="total">0.00</span></p>
+
+      <div id="checkout-form">
+        <h3>Delivery Details</h3>
+        <input type="text" id="customer_name" placeholder="Full name" required />
+        <input type="text" id="customer_phone" placeholder="Phone number" />
+        <textarea id="address" placeholder="Delivery address"></textarea>
+        <button class="checkout-btn" onclick="checkout()">Place Order</button>
+      </div>
+    </section>
+
+    <section id="orders" class="view">
+      <h2>My Orders</h2>
+      <div id="orders-container"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

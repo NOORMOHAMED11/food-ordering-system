@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "your-dockerhub-username/tastygo"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/YOUR_USERNAME/food-ordering-system.git'
+            }
+        }
+
+        stage('Install & Smoke Test') {
+            steps {
+                sh '''
+                    cd backend
+                    pip install -r requirements.txt
+                    python -c "import app; print('App imports cleanly')"
+                '''
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t ${DOCKER_IMAGE}:latest .'
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh 'trivy image --exit-code 0 --severity CRITICAL,HIGH ${DOCKER_IMAGE}:latest || true'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:latest
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo '✅ Build, scan, and push completed successfully.' }
+        failure { echo '❌ Pipeline failed — check the stage logs above.' }
+    }
+}
