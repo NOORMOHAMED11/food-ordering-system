@@ -29,15 +29,35 @@ pipeline {
                 sh 'docker images noormohamed11/food-ordering-backend'
             }
         }
+
+        stage('Docker Hub Push') {
+            steps {
+                echo 'Pushing image to Docker Hub...'
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                        docker push noormohamed11/food-ordering-backend:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'CI pipeline completed successfully!'
+            echo 'CI/CD pipeline completed successfully!'
         }
 
         failure {
-            echo 'CI pipeline failed!'
+            echo 'CI/CD pipeline failed!'
         }
     }
 }
